@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--角色表持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.IRoleDao">
+    <sql id="column_list">
+        ROLE_ID,
+        ROLE_NAME,
+        ROLE_ROLE_ID,
+        ROLE_PATH
+    </sql>
+
+    <!-- 角色表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.RoleEntity" >
+        <id column="ROLE_ID" property="baseTreeId" /><!-- 角色ID -->
+        <result column="ROLE_NAME" property="roleName" /><!-- 角色名称 -->
+        <result column="ROLE_ROLE_ID" property="baseTreeParentId" /><!-- 父级角色ID -->
+        <result column="ROLE_PATH" property="baseTreeParentPath" /><!-- 角色路径 -->
+
+    </resultMap>
+    <!-- 角色表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 角色表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="baseTreeId"  parameterType="com.refill.basic.entity.RoleEntity">
+        insert into role
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">ROLE_NAME,</if>
+            <if test="baseTreeParentId &gt;0">ROLE_ROLE_ID,</if>
+            <if test="baseTreeParentPath != null">ROLE_PATH,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">#{roleName},</if>
+            <if test="baseTreeParentId &gt;0">#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">#{baseTreeParentPath},</if>
+        </trim>
+    </insert>
+    <!-- 角色表Insert结束 -->
+
+    <!-- 角色表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.basic.entity.RoleEntity">
+        update role
+        <set>
+            <if test = "roleName != null">ROLE_NAME=#{roleName},</if>
+            <if test = "baseTreeParentId &gt;0">ROLE_ROLE_ID=#{baseTreeParentId},</if>
+            <if test = "baseTreeParentPath != null">ROLE_PATH=#{baseTreeParentPath},</if>
+        </set>
+        where ROLE_ID = #{baseTreeId}
+    </update>
+    <!-- 角色表Update结束 -->
+
+    <!--角色表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select
+        <include refid="column_list"/>
+        from role where ROLE_ID = #{baseTreeId}
+    </select>
+    <!-- 角色表Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.roleName != null">
+                and ROLE_NAME like CONCAT('%',#{whereMap.roleName},'%')
+            </if>
+            <if test="whereMap.baseTreeParentPath != null">
+                and ROLE_PATH like CONCAT('%',#{whereMap.baseTreeParentPath},'%')
+            </if>
+            <if test="whereMap.baseTreeParentId != null">
+                and ROLE_ROLE_ID = #{baseTreeParentId}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <foreach collection="orderList" item="item" index="index" separator=",">
+            <if test="item.orderBy == 'baseTreeId' ">
+                ROLE_ID ${item.order},
+            </if>
+            <if test="item.orderBy == 'roleName' ">
+                ROLE_NAME ${item.order},
+            </if>
+            <if test="item.orderBy == 'baseTreeParentId'">
+                ROLE_ROLE_ID ${item.order},
+            </if>
+        </foreach>
+    </sql>
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+
+    <select id="countByMap" resultType="int">
+        select count(*)
+        from role
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from role
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderList != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+</mapper>
+

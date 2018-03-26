@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--平台销售记录表持久化SQL映射xml -->
+<mapper namespace="com.refill.maill.dao.ISalesRecordDao">
+    <sql id="column_list">
+        SR_ID,
+        SR_COMMODITY_ID,
+        SR_USER_ID,
+        SR_CR_ID,
+        SR_PRICE,
+        SR_PAYMENT,
+        SR_CREATEDATE,
+        SR_STATUS
+    </sql>
+
+    <!-- 平台销售记录表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.maill.entity.SalesRecordEntity" >
+        <id column="SR_ID" property="salesRecordId" /><!-- 商品销售记录自增长ID -->
+        <result column="SR_COMMODITY_ID" property="salesRecordCommodityId" /><!-- 商品商品ID -->
+        <result column="SR_USER_ID" property="salesRecordUserId" /><!-- 购买用户ID -->
+        <result column="SR_CR_ID" property="salesRecordCouponRecordId" /><!-- 优惠券记录ID -->
+        <result column="SR_PRICE" property="salesRecordPrice" /><!-- 商品支付价格 -->
+        <result column="SR_PAYMENT" property="salesRecordPayment" /><!-- 支付方式(1.微信2.支付宝3.银联) -->
+        <result column="SR_CREATE_DATE" property="salesRecordCreatedate" /><!-- 创建时间 -->
+        <result column="SR_STATUS" property="salesRecordStatus" /><!-- 订单状态 0 已下单,1.已取消 2.已付款 3.已发货 4已签收,5.退货中,6.已退货 7退款中 8 已退款 9. 已完成 -->
+    </resultMap>
+    <!-- 平台销售记录表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 平台销售记录表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="salesRecordId"  parameterType="com.refill.maill.entity.SalesRecordEntity">
+        insert into sales_record
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="salesRecordId != null">SR_ID,</if>
+            <if test="salesRecordCommodityId != null">SR_COMMODITY_ID,</if>
+            <if test="salesRecordUserId != null">SR_USER_ID,</if>
+            <if test="salesRecordCouponRecordId != null">SR_CR_ID,</if>
+            <if test="salesRecordPrice != null">SR_PRICE,</if>
+            <if test="salesRecordPayment != null">SR_PAYMENT,</if>
+            <if test="salesRecordCreatedate != null">SR_CREATEDATE,</if>
+            <if test="salesRecordStatus != null">SR_STATUS,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="salesRecordId != null">#{salesRecordId},</if>
+            <if test="salesRecordCommodityId != null">#{salesRecordCommodityId},</if>
+            <if test="salesRecordUserId != null">#{salesRecordUserId},</if>
+            <if test="salesRecordCouponRecordId != null">#{salesRecordCouponRecordId},</if>
+            <if test="salesRecordPrice != null">#{salesRecordPrice},</if>
+            <if test="salesRecordPayment != null">#{salesRecordPayment},</if>
+            <if test="salesRecordCreatedate != null">#{salesRecordCreatedate},</if>
+            <if test="salesRecordStatus != null">#{salesRecordStatus},</if>
+        </trim>
+    </insert>
+    <!-- 平台销售记录表Insert结束 -->
+
+    <!-- 平台销售记录表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.maill.entity.SalesRecordEntity">
+        update sales_record
+        <set>
+            <if test = "salesRecordCommodityId != null">SR_COMMODITY_ID=#{salesRecordCommodityId},</if>
+            <if test = "salesRecordUserId != null">SR_USER_ID=#{salesRecordUserId},</if>
+            <if test = "salesRecordCouponRecordId != null">SR_CR_ID=#{salesRecordCouponRecordId},</if>
+            <if test = "salesRecordPrice != null">SR_PRICE=#{salesRecordPrice},</if>
+            <if test = "salesRecordPayment != null">SR_PAYMENT=#{salesRecordPayment},</if>
+            <if test = "salesRecordCreatedate != null">SR_CREATEDATE=#{salesRecordCreatedate},</if>
+            <if test = "salesRecordStatus != null">SR_STATUS=#{salesRecordStatus},</if>
+        </set>
+        where SR_ID = #{salesRecordId}
+    </update>
+    <!-- 平台销售记录表Update结束 -->
+
+    <!--平台销售记录表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select * from sales_record where SR_ID = #{salesRecordId}
+    </select>
+    <!-- 平台销售记录表Select结束 -->
+
+</mapper>
+

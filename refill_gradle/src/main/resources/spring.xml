@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context-4.2.xsd
+               http://www.springframework.org/schema/aop
+               http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+               ">
+    <!--扫描注入的包，这里扫描了biz.impl和dao，扫描dao,是因为在biz.impl中需要引用，扫描biz是因为在其他地方需要引用-->
+    <context:component-scan base-package="com.refill.**.biz.impl"/>
+    <!--启用AOP-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <!-- 启用如 @Autowired and @Configuration等注解 -->
+    <!--context:annotation-config/-->
+</beans>
+

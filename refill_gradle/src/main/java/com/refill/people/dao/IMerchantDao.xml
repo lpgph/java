@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--商户表持久化SQL映射xml -->
+<mapper namespace="com.refill.people.dao.IMerchantDao">
+    <sql id="column_list">
+        MERCHANT_ID,
+        MERCHANT_PHONE,
+        MERCHANT_MAIL,
+        MERCHANT_ACCOUNT,
+        MERCHANT_PASSWORD,
+        MERCHANT_NAME,
+        MERCHANT_STATUS,
+        MERCHANT_CATEGORY_ID,
+        MERCHANT_PARENT_ID,
+        MERCHANT_PARENT_PATH,
+        MERCHANT_CREATE_DATE,
+        MERCHANT_UPDATE_DATE
+    </sql>
+
+    <!-- 商户表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.people.entity.MerchantEntity">
+        <id column="MERCHANT_ID" property="userId"/><!-- 商户ID -->
+        <result column="MERCHANT_PHONE" property="userPhone"/><!-- 商户手机 -->
+        <result column="MERCHANT_MAIL" property="userMail"/><!-- 商户邮箱 -->
+        <result column="MERCHANT_ACCOUNT" property="userAccount"/><!-- 商户账号 -->
+        <result column="MERCHANT_PASSWORD" property="userPassword"/><!-- 商户密码 -->
+        <result column="MERCHANT_NAME" property="userName"/><!-- 商户名称 -->
+        <result column="MERCHANT_STATUS" property="userStatus"/><!-- 商户状态 -->
+        <result column="MERCHANT_CATEGORY_ID" property="userCategoryId"/><!-- 商户类别 -->
+        <result column="MERCHANT_PARENT_ID" property="merchantParentId"/><!-- 商户父级ID -->
+        <result column="MERCHANT_PARENT_PATH" property="merchantParentPath"/><!-- 商户父级路径 -->
+        <result column="MERCHANT_CREATE_DATE" property="userCreateDate"/><!-- 商户创建时间 -->
+        <result column="MERCHANT_UPDATE_DATE" property="userUpdateDate"/><!-- 商户更新时间 -->
+    </resultMap>
+    <!-- 商户表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 商户表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="userId"
+            parameterType="com.refill.people.entity.MerchantEntity">
+        insert into merchant
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userPhone != null">MERCHANT_PHONE,</if>
+            <if test="userMail != null">MERCHANT_MAIL,</if>
+            <if test="userAccount != null">MERCHANT_ACCOUNT,</if>
+            <if test="userPassword != null">MERCHANT_PASSWORD,</if>
+            <if test="userName != null">MERCHANT_NAME,</if>
+            <if test="userStatus != null">MERCHANT_STATUS,</if>
+            <if test="userCategoryId &gt;0">MERCHANT_CATEGORY_ID,</if>
+            <if test="merchantParentId &gt;0">MERCHANT_PARENT_ID,</if>
+            <if test="merchantParentPath != null">MERCHANT_PARENT_PATH,</if>
+            <if test="userCreateDate != null">MERCHANT_CREATE_DATE,</if>
+            <if test="userUpdateDate != null">MERCHANT_UPDATE_DATE,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userPhone != null">#{userPhone},</if>
+            <if test="userMail != null">#{userMail},</if>
+            <if test="userAccount != null">#{userAccount},</if>
+            <if test="userPassword != null">#{userPassword},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="userStatus != null">#{userStatus},</if>
+            <if test="userCategoryId &gt;0">#{userCategoryId},</if>
+            <if test="merchantParentId &gt;0">#{merchantParentId},</if>
+            <if test="merchantParentPath != null">#{merchantParentPath},</if>
+            <if test="userCreateDate != null">#{userCreateDate},</if>
+            <if test="userUpdateDate != null">#{userUpdateDate},</if>
+        </trim>
+    </insert>
+    <!-- 商户表Insert结束 -->
+
+    <!-- 商户表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.people.entity.MerchantEntity">
+        update merchant
+        <set>
+            <if test="userPhone != null">MERCHANT_PHONE=#{userPhone},</if>
+            <if test="userMail != null">MERCHANT_MAIL=#{userMail},</if>
+            <if test="userAccount != null">MERCHANT_ACCOUNT=#{userAccount},</if>
+            <if test="userPassword != null">MERCHANT_PASSWORD=#{userPassword},</if>
+            <if test="userName != null">MERCHANT_NAME=#{userName},</if>
+            <if test="userStatus != null">MERCHANT_STATUS=#{userStatus},</if>
+            <if test="userCategoryId &gt;0">MERCHANT_CATEGORY_ID=#{userCategoryId},</if>
+            <if test="merchantParentId &gt;0">MERCHANT_PARENT_ID=#{merchantParentId},</if>
+            <if test="merchantParentPath != null">MERCHANT_PARENT_PATH=#{merchantParentPath},</if>
+            <if test="userCreateDate != null">MERCHANT_CREATE_DATE=#{userCreateDate},</if>
+            <if test="userUpdateDate != null">MERCHANT_UPDATE_DATE=#{userUpdateDate},</if>
+        </set>
+        where MERCHANT_ID = #{userId}
+    </update>
+    <!-- 商户表Update结束 -->
+
+    <!--商户表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        SELECT *
+        FROM merchant
+        WHERE MERCHANT_ID = #{userId}
+    </select>
+    <!-- 商户表Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.userAccount != null">
+                and MERCHANT_ACCOUNT like CONCAT('%',#{whereMap.userAccount},'%')
+            </if>
+            <if test="whereMap.userMail != null">
+                and MERCHANT_MAIL like CONCAT('%',#{whereMap.userMail},'%')
+            </if>
+            <if test="whereMap.userPhone != null">
+                and MERCHANT_PHONE like CONCAT('%',#{whereMap.userPhone},'%')
+            </if>
+            <if test="whereMap.merchantParentPath != null">
+                and MERCHANT_PARENT_PATH like CONCAT('%',#{whereMap.merchantParentPath},'%')
+            </if>
+            <if test="whereMap.userStatus !=null">
+                and MERCHANT_STATUS=#{whereMap.userStatus}
+            </if>
+            <if test="whereMap.merchantParentId !=null">
+                and MERCHANT_PARENT_ID=#{whereMap.merchantParentId}
+            </if>
+            <if test="whereMap.userCreateDate !=null">
+                and MERCHANT_CREATE_DATE=#{whereMap.userCreateDate}
+            </if>
+            <if test="whereMap.userCategoryId !=null">
+                and MERCHANT_CATEGORY_ID=#{whereMap.userCategoryId}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <trim suffix="" suffixOverrides=",">
+            <if test="orderMap.userCreateDate != null">
+                MERCHANT_CREATE_DATE ${orderMap.userCreateDate},
+            </if>
+            <if test="orderMap.userAccount != null">
+                MERCHANT_ACCOUNT ${orderMap.userAccount},
+            </if>
+            <if test="orderMap.userName != null">
+                MERCHANT_NAME ${orderMap.userName},
+            </if>
+            <if test="orderMap.userStatus != null">
+                MERCHANT_STATUS ${orderMap.userStatus},
+            </if>
+        </trim>
+    </sql>
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+    <!--通过条件查询总条数 -->
+    <select id="countByMap" resultType="int">
+        select count(*)
+        from merchant
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from merchant
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderMap != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+</mapper>
+

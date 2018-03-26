@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--信息表持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.IInformationDao">
+    <!--允许查询字段-->
+    <sql id="column_list">
+        INFORMATION_ID,
+        INFORMATION_TITLE,
+        INFORMATION_DESCRIPTION,
+        INFORMATION_CATEGORY_ID,
+        INFORMATION_CONTENT,
+        INFORMATION_COMMENT_NUMBER,
+        INFORMATION_HIT_NUMBER,
+        INFORMATION_CREATE_DATE,
+        INFORMATION_CREATE_PEOPLE_ID,
+        INFORMATION_UPDATE_DATE,
+        INFORMATION_UPDATE_PEOPLE_ID
+    </sql>
+
+    <!-- 信息表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.InformationEntity">
+        <id column="INFORMATION_ID" property="informationId"/><!-- 信息自增长ID -->
+        <result column="INFORMATION_TITLE" property="informationTitle"/><!-- 信息标题 -->
+        <result column="INFORMATION_DESCRIPTION" property="informationDescription"/><!-- 信息描述 -->
+        <result column="INFORMATION_CATEGORY_ID" property="informationCategoryId"/><!-- 信息类别 -->
+        <result column="INFORMATION_CONTENT" property="informationContent"/><!-- 信息内容 -->
+        <result column="INFORMATION_COMMENT_NUMBER" property="informationCommentNumber"/><!-- 信息评论次数 -->
+        <result column="INFORMATION_HIT_NUMBER" property="informationHitNumber"/><!-- 信息点击量 -->
+        <result column="INFORMATION_CREATE_DATE" property="informationCreateDate"/><!-- 信息创建时间 -->
+        <result column="INFORMATION_CREATE_PEOPLE_ID" property="informationCreatePeopleId"/><!-- 信息创建人 -->
+        <result column="INFORMATION_UPDATE_DATE" property="informationUpdateDate"/><!-- 信息更新时间 -->
+        <result column="INFORMATION_UPDATE_PEOPLE_ID" property="informationUpdatePeopleId"/><!-- 信息更新人 -->
+    </resultMap>
+    <!-- 信息表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 信息表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="informationId"
+            parameterType="com.refill.basic.entity.InformationEntity">
+        insert into information
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="informationTitle != null">INFORMATION_TITLE,</if>
+            <if test="informationDescription != null">INFORMATION_DESCRIPTION,</if>
+            <if test="informationCategoryId != null">INFORMATION_CATEGORY_ID,</if>
+            <if test="informationContent != null">INFORMATION_CONTENT,</if>
+            <if test="informationCommentNumber != null">INFORMATION_COMMENT_NUMBER,</if>
+            <if test="informationHitNumber != null">INFORMATION_HIT_NUMBER,</if>
+            <if test="informationCreateDate != null">INFORMATION_CREATE_DATE,</if>
+            <if test="informationCreatePeopleId != null">INFORMATION_CREATE_PEOPLE_ID,</if>
+            <if test="informationUpdateDate != null">INFORMATION_UPDATE_DATE,</if>
+            <if test="informationUpdatePeopleId != null">INFORMATION_UPDATE_PEOPLE_ID,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="informationTitle != null">#{informationTitle},</if>
+            <if test="informationDescription != null">#{informationDescription},</if>
+            <if test="informationCategoryId != null">#{informationCategoryId},</if>
+            <if test="informationContent != null">#{informationContent},</if>
+            <if test="informationCommentNumber != null">#{informationCommentNumber},</if>
+            <if test="informationHitNumber != null">#{informationHitNumber},</if>
+            <if test="informationCreateDate != null">#{informationCreateDate},</if>
+            <if test="informationCreatePeopleId != null">#{informationCreatePeopleId},</if>
+            <if test="informationUpdateDate != null">#{informationUpdateDate},</if>
+            <if test="informationUpdatePeopleId != null">#{informationUpdatePeopleId},</if>
+        </trim>
+    </insert>
+    <!-- 信息表Insert结束 -->
+
+    <!-- 信息表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.basic.entity.InformationEntity">
+        update information
+        <set>
+            <if test="informationTitle != null">INFORMATION_TITLE=#{informationTitle},</if>
+            <if test="informationDescription != null">INFORMATION_DESCRIPTION=#{informationDescription},</if>
+            <if test="informationCategoryId != null">INFORMATION_CATEGORY_ID=#{informationCategoryId},</if>
+            <if test="informationContent != null">INFORMATION_CONTENT=#{informationContent},</if>
+            <if test="informationCommentNumber != null">INFORMATION_COMMENT_NUMBER=#{informationCommentNumber},</if>
+            <if test="informationHitNumber != null">INFORMATION_HIT_NUMBER=#{informationHitNumber},</if>
+            <if test="informationCreateDate != null">INFORMATION_CREATE_DATE=#{informationCreateDate},</if>
+            <if test="informationCreatePeopleId != null">INFORMATION_CREATE_PEOPLE_ID=#{informationCreatePeopleId},</if>
+            <if test="informationUpdateDate != null">INFORMATION_UPDATE_DATE=#{informationUpdateDate},</if>
+            <if test="informationUpdatePeopleId != null">INFORMATION_UPDATE_PEOPLE_ID=#{informationUpdatePeopleId},</if>
+        </set>
+        where INFORMATION_ID = #{informationId}
+    </update>
+    <!-- 信息表Update结束 -->
+
+    <!--删除一条-->
+    <delete id="deleteEntity" parameterType="int">
+        DELETE FROM information
+        WHERE INFORMATION_ID = #{informationId}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteBatch" parameterType="List">
+        DELETE FROM information
+        <where>
+            INFORMATION_ID in
+            <foreach collection="ids" item="item" index="index" open="("
+                     separator="," close=")">#{item}
+            </foreach>
+        </where>
+    </delete>
+
+    <!--根据ID查询实体开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        SELECT *
+        FROM information
+        WHERE INFORMATION_ID = #{informationId}
+    </select>
+
+    <!-- ********************************** information查询条件 ********************************** -->
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.informationTitle != null">
+                and INFORMATION_TITLE like CONCAT('%',#{whereMap.informationTitle},'%')
+            </if>
+            <if test="whereMap.informationCategoryId &gt;0">
+                and INFORMATION_CATEGORY_ID=#{whereMap.informationCategoryId}
+            </if>
+
+            <if test="whereMap.categoryIds != null ">
+                and INFORMATION_CATEGORY_ID in
+                <foreach collection="whereMap.categoryIds" item="item" index="index" open="("
+                         separator="," close=")">#{item}
+                </foreach>
+            </if>
+            <if test="whereMap.informationCreateDate !=null">
+                and INFORMATION_CREATE_DATE=#{whereMap.informationCreateDate}
+            </if>
+            <if test="whereMap.informationUpdateDate !=null">
+                and INFORMATION_UPDATE_DATE=#{whereMap.informationUpdateDate}
+            </if>
+            <if test="whereMap.informationCreatePeopleId &gt;0">
+                and INFORMATION_CREATE_PEOPLE_ID=#{whereMap.informationCreatePeopleId}
+            </if>
+            <if test="whereMap.informationUpdatePeopleId &gt;0">
+                and INFORMATION_UPDATE_PEOPLE_ID=#{whereMap.informationUpdatePeopleId}
+            </if>
+        </if>
+    </sql>
+
+    <!-- ********************************** information排序条件 ********************************** -->
+    <sql id="orderby">
+        <foreach collection="orderList" item="item" index="index" separator=",">
+            <if test="item.orderBy =='informationCommentNumber'">
+                INFORMATION_COMMENT_NUMBER  ${item.order}
+            </if>
+            <if test="item.orderBy == 'informationHitNumber' ">
+                INFORMATION_HIT_NUMBER  ${item.order}
+            </if>
+            <if test="item.orderBy == 'informationCreateDate' ">
+                INFORMATION_CREATE_DATE  ${item.order}
+            </if>
+            <if test="item.orderBy == 'informationUpdateDate' ">
+                INFORMATION_UPDATE_DATE  ${item.order}
+            </if>
+            <if test="item.orderBy == 'informationTitle' ">
+                INFORMATION_TITLE  ${item.order}
+            </if>
+        </foreach>
+    </sql>
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+
+    <!--通过条件查询总条数 -->
+    <select id="countByMap" resultType="int">
+        select count(*)
+        from information
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from information
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderList != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+</mapper>
+

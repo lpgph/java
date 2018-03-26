@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--类别表持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.ICategoryDao">
+    <!-- 查询字段 -->
+    <sql id="column_list">
+        CATEGORY_ID,
+        CATEGORY_TITLE,
+        CATEGORY_CATEGORY_ID,
+        CATEGORY_PATH,
+        CATEGORY_SORT,
+        CATEGORY_MODULE_ID,
+        CATEGORY_CREATE_DATE,
+        CATEGORY_CREATE_PEOPLE_ID,
+        CATEGORY_UPDATE_DATE,
+        CATEGORY_UPDATE_PEOPLE_ID
+    </sql>
+
+    <!-- 类别表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.CategoryEntity">
+        <id column="CATEGORY_ID" property="baseTreeId"/><!-- 分类ID -->
+        <result column="CATEGORY_TITLE" property="categoryTitle"/><!-- 分类标题 -->
+        <result column="CATEGORY_CATEGORY_ID" property="baseTreeParentId"/><!-- 父级分类ID -->
+        <result column="CATEGORY_PATH" property="baseTreeParentPath"/><!-- 分类父级路径 -->
+        <result column="CATEGORY_SORT" property="categorySort"/><!-- 分类排序 -->
+        <result column="CATEGORY_MODULE_ID" property="categoryModuleId"/><!-- 分类模块ID -->
+        <result column="CATEGORY_CREATE_DATE" property="categoryCreateDate"/><!-- 创建时间 -->
+        <result column="CATEGORY_CREATE_PEOPLE_ID" property="categoryCreatePeopleId"/><!-- 创建人ID -->
+        <result column="CATEGORY_UPDATE_DATE" property="categoryUpdateDate"/><!-- 更新时间 -->
+        <result column="CATEGORY_UPDATE_PEOPLE_ID" property="categoryUpdatePeopleId"/><!-- 最后更新人ID -->
+    </resultMap>
+    <!-- 类别表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 类别表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="baseTreeId"
+            parameterType="com.refill.basic.entity.CategoryEntity">
+        insert into category
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryTitle != null">CATEGORY_TITLE,</if>
+            <if test="baseTreeParentId != null">CATEGORY_CATEGORY_ID,</if>
+            <if test="baseTreeParentPath != null">CATEGORY_PATH,</if>
+            <if test="categorySort != null">CATEGORY_SORT,</if>
+            <if test="categoryModuleId != null">CATEGORY_MODULE_ID,</if>
+            <if test="categoryCreateDate != null">CATEGORY_CREATE_DATE,</if>
+            <if test="categoryCreatePeopleId != null">CATEGORY_CREATE_PEOPLE_ID,</if>
+            <if test="categoryUpdateDate != null">CATEGORY_UPDATE_DATE,</if>
+            <if test="categoryUpdatePeopleId != null">CATEGORY_UPDATE_PEOPLE_ID,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryTitle != null">#{categoryTitle},</if>
+            <if test="baseTreeParentId != null">#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">#{baseTreeParentPath},</if>
+            <if test="categorySort != null">#{categorySort},</if>
+            <if test="categoryModuleId != null">#{categoryModuleId},</if>
+            <if test="categoryCreateDate != null">#{categoryCreateDate},</if>
+            <if test="categoryCreatePeopleId != null">#{categoryCreatePeopleId},</if>
+            <if test="categoryUpdateDate != null">#{categoryUpdateDate},</if>
+            <if test="categoryUpdatePeopleId != null">#{categoryUpdatePeopleId},</if>
+        </trim>
+    </insert>
+    <!-- 类别表Insert结束 -->
+
+    <!-- 类别表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.basic.entity.CategoryEntity">
+        update category
+        <set>
+            <if test="categoryTitle != null">CATEGORY_TITLE=#{categoryTitle},</if>
+            <if test="baseTreeParentId != null">CATEGORY_CATEGORY_ID=#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">CATEGORY_PATH=#{baseTreeParentPath},</if>
+            <if test="categorySort != null">CATEGORY_SORT=#{categorySort},</if>
+            <if test="categoryModuleId != null">CATEGORY_MODULE_ID=#{categoryModuleId},</if>
+            <if test="categoryCreateDate != null">CATEGORY_CREATE_DATE=#{categoryCreateDate},</if>
+            <if test="categoryCreatePeopleId != null">CATEGORY_CREATE_PEOPLE_ID=#{categoryCreatePeopleId},</if>
+            <if test="categoryUpdateDate != null">CATEGORY_UPDATE_DATE=#{categoryUpdateDate},</if>
+            <if test="categoryUpdatePeopleId != null">CATEGORY_UPDATE_PEOPLE_ID=#{categoryUpdatePeopleId},</if>
+        </set>
+        where CATEGORY_ID = #{baseTreeId}
+    </update>
+    <!-- 类别表Update结束 -->
+
+    <!--类别表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        SELECT
+        <include refid="column_list"/>
+        FROM category
+        WHERE CATEGORY_ID = #{baseTreeId}
+    </select>
+    <!-- 类别表Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.categoryTitle != null">
+                and CATEGORY_TITLE like CONCAT('%',#{whereMap.categoryTitle},'%')
+            </if>
+            <if test="whereMap.baseTreeParentPath != null">
+                and CATEGORY_PATH like CONCAT('%',#{whereMap.baseTreeParentPath},'%')
+            </if>
+            <if test="whereMap.categoryCreateDate !=null">
+                and CATEGORY_CREATE_DATE=#{whereMap.categoryCreateDate}
+            </if>
+            <if test="whereMap.categoryCreatePeopleId &gt;0">
+                and CATEGORY_CREATE_PEOPLE_ID=#{whereMap.categoryCreatePeopleId}
+            </if>
+        </if>
+    </sql>
+    <!-- 排序方式 -->
+    <sql id="orderby">
+        <foreach collection="orderList" item="item" index="index" separator=",">
+            <if test="item.orderBy == 'categoryCreateDate' ">
+                CATEGORY_CREATE_DATE ${item.order}
+            </if>
+            <if test="item.orderBy == 'categoryTitle' ">
+                CATEGORY_TITLE ${item.order}
+            </if>
+            <if test="item.orderBy == 'baseTreeParentId'">
+                CATEGORY_CATEGORY_ID ${item.order}
+            </if>
+        </foreach>
+    </sql>
+
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+    <!--通过条件查询总条数 -->
+    <select id="countByModuleIdAndMap" resultType="int">
+        select count(*)
+        from category
+        <where>
+            CATEGORY_MODULE_ID=#{moduleId}
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByModuleIdAndMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from category
+        <where>
+            CATEGORY_MODULE_ID=#{moduleId}
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderList != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+
+</mapper>
+

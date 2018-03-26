@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--管理员持久化SQL映射xml -->
+<mapper namespace="com.refill.people.dao.IManagerDao">
+    <sql id="column_list">
+        MANAGER_ID,
+        MANAGER_NAME,
+        MANAGER_ACCOUNT,
+        MANAGER_PASSWORD,
+        MANAGER_ROLE_ID,
+        MANAGER_CATEGORY_ID,
+        MANAGER_PARENT_ID,
+        MANAGER_PARENT_PATH,
+        MANAGER_CREATE_DATE,
+        MANAGER_UPDATE_DATE
+    </sql>
+
+    <!-- 管理员字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.people.entity.ManagerEntity" >
+        <id column="MANAGER_ID" property="userId" /><!-- 管理员ID -->
+        <result column="MANAGER_NAME" property="userName" /><!-- 管理员名称 -->
+        <result column="MANAGER_ACCOUNT" property="userAccount" /><!-- 管理员账号 -->
+        <result column="MANAGER_PASSWORD" property="userPassword" /><!-- 管理员密码 -->
+        <result column="MANAGER_ROLE_ID" property="managerRoleId" /><!-- 管理员角色ID -->
+        <result column="MANAGER_CATEGORY_ID" property="userCategoryId" /><!-- 管理员分类ID -->
+        <result column="MANAGER_PARENT_ID" property="managerParentId" /><!-- 管理员父级ID -->
+        <result column="MANAGER_PARENT_PATH" property="managerParentPath" /><!-- 管理员父级路径 -->
+        <result column="MANAGER_CREATE_DATE" property="userCreateDate" /><!-- 管理员创建时间 -->
+        <result column="MANAGER_UPDATE_DATE" property="userUpdateDate" /><!-- 管理员更新时间 -->
+    </resultMap>
+    <!-- 管理员字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 管理员Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="userId"  parameterType="com.refill.people.entity.ManagerEntity">
+        insert into manager
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userName != null">MANAGER_NAME,</if>
+            <if test="userAccount != null">MANAGER_ACCOUNT,</if>
+            <if test="userPassword != null">MANAGER_PASSWORD,</if>
+            <if test="managerRoleId &gt;0">MANAGER_ROLE_ID,</if>
+            <if test="userCategoryId &gt;0">MANAGER_CATEGORY_ID,</if>
+            <if test = "managerParentId &gt;0">MANAGER_PARENT_ID,</if>
+            <if test = "managerParentPath != null">MANAGER_PARENT_PATH,</if>
+            <if test = "userCreateDate != null">MANAGER_CREATE_DATE,</if>
+            <if test = "userUpdateDate != null">MANAGER_UPDATE_DATE</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userName != null">#{userName},</if>
+            <if test="userAccount != null">#{userAccount},</if>
+            <if test="userPassword != null">#{userPassword},</if>
+            <if test="managerRoleId &gt;0">#{managerRoleId},</if>
+            <if test="userCategoryId &gt;0">#{userCategoryId},</if>
+            <if test = "managerParentId &gt;0">#{managerParentId},</if>
+            <if test = "managerParentPath != null">#{managerParentPath},</if>
+            <if test = "userCreateDate != null">#{userCreateDate},</if>
+            <if test = "userUpdateDate != null">#{userUpdateDate}</if>
+        </trim>
+    </insert>
+    <!-- 管理员Insert结束 -->
+
+    <!-- 管理员Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.people.entity.ManagerEntity">
+        update manager
+        <set>
+            <if test = "userName != null">MANAGER_NAME=#{userName},</if>
+            <if test = "userAccount != null">MANAGER_ACCOUNT=#{userAccount},</if>
+            <if test = "userPassword != null">MANAGER_PASSWORD=#{userPassword},</if>
+            <if test = "managerRoleId &gt;0">MANAGER_ROLE_ID=#{managerRoleId},</if>
+            <if test = "userCategoryId &gt;0">MANAGER_CATEGORY_ID=#{userCategoryId},</if>
+            <if test = "managerParentId &gt;0">MANAGER_PARENT_ID=#{managerParentId},</if>
+            <if test = "managerParentPath != null">MANAGER_PARENT_PATH=#{managerParentPath},</if>
+            <if test = "userCreateDate != null">MANAGER_CREATE_DATE=#{userCreateDate},</if>
+            <if test = "userUpdateDate != null">MANAGER_UPDATE_DATE=#{userUpdateDate}</if>
+        </set>
+        where MANAGER_ID = #{userId}
+    </update>
+    <!-- 管理员Update结束 -->
+
+    <!--管理员Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select
+        <include refid="column_list"/>
+        from manager where MANAGER_ID = #{userId}
+    </select>
+    <!-- 管理员Select结束 -->
+
+    <!-- 通过账号查询管理员 -->
+    <select id="getEntityByAccount" resultMap="resultMap" parameterType="int">
+        select
+        <include refid="column_list"/>
+        from manager where MANAGER_ACCOUNT = #{account}
+    </select>
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.userName != null">
+                and MANAGER_NAME like CONCAT('%',#{whereMap.userName},'%')
+            </if>
+            <if test="whereMap.managerParentPath != null">
+                and MANAGER_PARENT_PATH like CONCAT('%',#{whereMap.managerParentPath},'%')
+            </if>
+            <if test="whereMap.managerParentId &gt;0">
+                and MANAGER_PARENT_ID=#{whereMap.managerParentId}
+            </if>
+            <if test="whereMap.userAccount != null">
+                and MANAGER_ACCOUNT like CONCAT('%',#{whereMap.userName},'%')
+            </if>
+            <if test="whereMap.managerRoleId &gt;0">
+                and MANAGER_ROLE_ID=#{whereMap.managerRoleId}
+            </if>
+            <if test="whereMap.userCategoryId &gt;0">
+                and MANAGER_CATEGORY_ID=#{whereMap.userCategoryId}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <trim suffix="" suffixOverrides=",">
+            <if test="orderMap.userName != null">
+                MANAGER_NAME ${orderMap.userName},
+            </if>
+            <if test="orderMap.userAccount != null">
+                MANAGER_ACCOUNT ${orderMap.userAccount},
+            </if>
+            <if test="orderMap.managerRoleId != null">
+                MANAGER_ROLE_ID ${orderMap.managerRoleId},
+            </if>
+            <if test="orderMap.userAccount != null">
+                MANAGER_CATEGORY_ID ${orderMap.userCategoryId},
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+    <!-- 通过条件查询管理员总条数 -->
+    <select id="countByMap">
+        select count(*)
+        from manager
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!-- 通过条件查询管理员集合 -->
+    <select id="queryListByMapPage">
+        select
+        <include refid="column_list"/>
+        from manager
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderMap != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+
+</mapper>
+

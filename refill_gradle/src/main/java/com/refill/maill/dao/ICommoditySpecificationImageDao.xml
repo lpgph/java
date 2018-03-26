@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--商品规格图片路径表持久化SQL映射xml -->
+<mapper namespace="com.refill.maill.dao.ICommoditySpecificationImageDao">
+    <sql id="column_list">
+        CSI_ID,
+        CSI_PATH,
+        CSI_TYPE,
+        CSI_CS_ID
+    </sql>
+
+    <!-- 商品规格图片路径表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.maill.entity.CommoditySpecificationImageEntity" >
+        <id column="CSI_ID" property="commoditySpecificationImageId" /><!-- 商品规格图片自增长ID -->
+        <result column="CSI_PATH" property="commoditySpecificationImagePath" /><!-- 图片路径 -->
+        <result column="CSI_TYPE" property="commoditySpecificationImageType" /><!-- 商品规格图片类型0.正常1.默认选择 -->
+        <result column="CSI_CS_ID" property="commoditySpecificationImageCommoditySpecificationId" /><!-- 商品规格ID -->
+    </resultMap>
+    <!-- 商品规格图片路径表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 商品规格图片路径表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="commoditySpecificationImageId"  parameterType="com.refill.maill.entity.CommoditySpecificationImageEntity">
+        insert into commodity_specification_image
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commoditySpecificationImageId != null">CSI_ID,</if>
+            <if test="commoditySpecificationImagePath != null">CSI_PATH,</if>
+            <if test="commoditySpecificationImageType != null">CSI_TYPE,</if>
+            <if test="commoditySpecificationImageCommoditySpecificationId != null">CSI_CS_ID,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commoditySpecificationImageId != null">#{commoditySpecificationImageId},</if>
+            <if test="commoditySpecificationImagePath != null">#{commoditySpecificationImagePath},</if>
+            <if test="commoditySpecificationImageType != null">#{commoditySpecificationImageType},</if>
+            <if test="commoditySpecificationImageCommoditySpecificationId != null">#{commoditySpecificationImageCommoditySpecificationId},</if>
+        </trim>
+    </insert>
+    <!-- 商品规格图片路径表Insert结束 -->
+
+    <!-- 商品规格图片路径表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.maill.entity.CommoditySpecificationImageEntity">
+        update commodity_specification_image
+        <set>
+            <if test = "commoditySpecificationImagePath != null">CSI_PATH=#{commoditySpecificationImagePath},</if>
+            <if test = "commoditySpecificationImageType != null">CSI_TYPE=#{commoditySpecificationImageType},</if>
+            <if test = "commoditySpecificationImageCommoditySpecificationId != null">CSI_CS_ID=#{commoditySpecificationImageCommoditySpecificationId},</if>
+        </set>
+        where CSI_ID = #{commoditySpecificationImageId}
+    </update>
+    <!-- 商品规格图片路径表Update结束 -->
+
+    <!--商品规格图片路径表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select *  from commodity_specification_image where CSI_ID = #{commoditySpecificationImageId}
+    </select>
+    <!-- 商品规格图片路径表Select结束 -->
+
+</mapper>
+

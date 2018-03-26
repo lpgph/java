@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--平台发布的商品持久化SQL映射xml -->
+    <mapper namespace="com.refill.maill.dao.ICommodityDao">
+        <sql id="column_list">
+            COMMODITY_ID,
+            COMMODITY_TITLE,
+            COMMODITY_CONTENT,
+            COMMODITY_PRICE,
+            COMMODITY_ICON_PATH,
+            COMMODITY_QUANTITY,
+            COMMODITY_CATEGORY_ID,
+            COMMODITY_TYPE,
+            COMMODITY_CREATE_DATE,
+            COMMODITY_CREATE_PEOPLE_ID,
+            COMMODITY_UPDATE_DATE,
+            COMMODITY_UPDATE_PEOPLE_ID,
+            COMMODITY_MODULE_ID
+        </sql>
+
+        <!-- 平台发布的商品字段和实体绑定,返回实体信息时使用 开始 -->
+        <resultMap id="resultMap" type="com.refill.maill.entity.CommodityEntity" >
+            <id column="COMMODITY_ID" property="informationId" /><!-- 商品自增长ID -->
+            <result column="COMMODITY_TITLE" property="informationTitle" /><!-- 商品标题 -->
+            <result column="COMMODITY_CONTENT" property="informationContent" /><!-- 商品内容 -->
+            <result column="COMMODITY_PRICE" property="commodityPrice" /><!-- 商品价格 -->
+            <result column="COMMODITY_ICON_PATH" property="informationIconPath" /><!-- 缩略图路径 -->
+            <result column="COMMODITY_QUANTITY" property="commodityQuantity" /><!-- 商品数量,有规格时自动计算,无规格时手动设置 -->
+            <result column="COMMODITY_CATEGORY_ID" property="informationCategoryId" /><!-- 商品类别ID -->
+            <result column="COMMODITY_TYPE" property="informationType" /><!-- 商品类型:0 商户商品 1 积分商品 -->
+            <result column="COMMODITY_CREATE_DATE" property="informationCreateDate" /><!-- 创建时间 -->
+            <result column="COMMODITY_CREATE_PEOPLE_ID" property="informationCreatePeopleId" /><!-- 发布商品人ID -->
+            <result column="COMMODITY_UPDATE_DATE" property="informationUpdateDate" /><!-- 最后更新时间 -->
+            <result column="COMMODITY_UPDATE_PEOPLE_ID" property="informationUpdatePeopleId" /><!-- 最后更新人ID -->
+            <result column="COMMODITY_MODULE_ID" property="informationModuleId" /><!-- 模块ID -->
+        </resultMap>
+        <!-- 平台发布的商品字段和实体绑定,返回实体信息时使用  结束 -->
+
+        <!-- 平台发布的商品Insert开始 -->
+        <insert id="saveEntity" useGeneratedKeys="true" keyProperty="informationId"  parameterType="com.refill.maill.entity.CommodityEntity">
+            insert into commodity
+            <!-- 添加表字段 -->
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="informationId != null">COMMODITY_ID,</if>
+                <if test="informationTitle != null">COMMODITY_TITLE,</if>
+                <if test="informationContent != null">COMMODITY_CONTENT,</if>
+                <if test="commodityPrice != null">COMMODITY_PRICE,</if>
+                <if test="informationIconPath != null">COMMODITY_ICON_PATH,</if>
+                <if test="commodityQuantity != null">COMMODITY_QUANTITY,</if>
+                <if test="informationCategoryId != null">COMMODITY_CATEGORY_ID,</if>
+                <if test="informationType != null">COMMODITY_TYPE,</if>
+                <if test="informationCreateDate != null">COMMODITY_CREATE_DATE,</if>
+                <if test="informationUpdateDate != null">COMMODITY_CREATE_PEOPLE_ID,</if>
+                <if test="informationUpdateDate != null">COMMODITY_UPDATE_DATE,</if>
+                <if test="informationUpdatePeopleId != null">COMMODITY_UPDATE_PEOPLE_ID,</if>
+                <if test="informationModuleId != null">COMMODITY_MODULE_ID,</if>
+            </trim>
+            <!-- 注入控制层字段 -->
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="informationId != null">#{informationId},</if>
+                <if test="informationTitle != null">#{informationTitle},</if>
+                <if test="informationContent != null">#{informationContent},</if>
+                <if test="commodityPrice != null">#{commodityPrice},</if>
+                <if test="informationIconPath != null">#{informationIconPath},</if>
+                <if test="commodityQuantity != null">#{commodityQuantity},</if>
+                <if test="informationCategoryId != null">#{informationCategoryId},</if>
+                <if test="informationType != null">#{informationType},</if>
+                <if test="informationCreateDate != null">#{informationCreateDate},</if>
+                <if test="informationUpdateDate != null">#{informationUpdateDate},</if>
+                <if test="informationUpdateDate != null">#{informationUpdateDate},</if>
+                <if test="informationUpdatePeopleId != null">#{informationUpdatePeopleId},</if>
+                <if test="informationModuleId != null">#{informationModuleId},</if>
+            </trim>
+        </insert>
+        <!-- 平台发布的商品Insert结束 -->
+
+        <!-- 平台发布的商品Update开始 -->
+        <update id="updateEntity" parameterType="com.refill.maill.entity.CommodityEntity">
+            update commodity
+            <set>
+                <if test = "informationTitle != null">COMMODITY_TITLE=#{informationTitle},</if>
+                <if test = "informationContent != null">COMMODITY_CONTENT=#{informationContent},</if>
+                <if test = "commodityPrice != null">COMMODITY_PRICE=#{commodityPrice},</if>
+                <if test = "informationIconPath != null">COMMODITY_ICON_PATH=#{informationIconPath},</if>
+                <if test = "commodityQuantity != null">COMMODITY_QUANTITY=#{commodityQuantity},</if>
+                <if test = "informationCategoryId != null">COMMODITY_CATEGORY_ID=#{informationCategoryId},</if>
+                <if test = "informationType != null">COMMODITY_TYPE=#{informationType},</if>
+                <if test = "informationCreateDate != null">COMMODITY_CREATE_DATE=#{informationCreateDate},</if>
+                <if test = "informationUpdateDate != null">COMMODITY_CREATE_PEOPLE_ID=#{informationUpdateDate},</if>
+                <if test = "informationUpdateDate != null">COMMODITY_UPDATE_DATE=#{informationUpdateDate},</if>
+                <if test = "informationUpdatePeopleId != null">COMMODITY_UPDATE_PEOPLE_ID=#{informationUpdatePeopleId},</if>
+                <if test = "informationModuleId != null">COMMODITY_MODULE_ID=#{informationModuleId},</if>
+            </set>
+            where COMMODITY_ID = #{informationId}
+        </update>
+        <!-- 平台发布的商品Update结束 -->
+
+        <!--平台发布的商品Select开始 -->
+        <select id="getEntity" resultMap="resultMap" parameterType="int">
+            select *  from commodity where COMMODITY_ID = #{informationId}
+        </select>
+        <!-- 平台发布的商品Select结束 -->
+
+
+</mapper>
+

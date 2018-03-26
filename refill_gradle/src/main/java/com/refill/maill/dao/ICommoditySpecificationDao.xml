@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--商品规格表持久化SQL映射xml -->
+<mapper namespace="com.refill.maill.dao.ICommoditySpecificationDao">
+    <sql id="column_list">
+        CS_ID,
+        CS_TITLE,
+        CS_COMMODITY_ID,
+        CS_ICON_PATH,
+        CS_TYPE,
+        CS_PRICE,
+        CS_QUANTITY
+    </sql>
+
+    <!-- 商品规格表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.maill.entity.CommoditySpecificationEntity" >
+        <id column="CS_ID" property="commoditySpecificationId" /><!-- 自增长ID -->
+        <result column="CS_TITLE" property="commoditySpecificationTitle" /><!-- 规格显示名称 -->
+        <result column="CS_COMMODITY_ID" property="commoditySpecificationCommodityId" /><!-- 所属商品ID -->
+        <result column="CS_ICON_PATH" property="commoditySpecificationIconPath" /><!-- 缩略图路径 -->
+        <result column="CS_TYPE" property="commoditySpecificationType" /><!-- 商品规格类型0.正常1.默认选择 -->
+        <result column="CS_PRICE" property="commoditySpecificationPrice" /><!-- 商品价格 -->
+        <result column="CS_QUANTITY" property="commoditySpecificationQuantity" /><!-- 数量 -->
+    </resultMap>
+    <!-- 商品规格表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 商品规格表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="commoditySpecificationId"  parameterType="com.refill.maill.entity.CommoditySpecificationEntity">
+        insert into commodity_specification
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commoditySpecificationId != null">CS_ID,</if>
+            <if test="commoditySpecificationTitle != null">CS_TITLE,</if>
+            <if test="commoditySpecificationCommodityId != null">CS_COMMODITY_ID,</if>
+            <if test="commoditySpecificationIconPath != null">CS_ICON_PATH,</if>
+            <if test="commoditySpecificationType != null">CS_TYPE,</if>
+            <if test="commoditySpecificationPrice != null">CS_PRICE,</if>
+            <if test="commoditySpecificationQuantity != null">CS_QUANTITY,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commoditySpecificationId != null">#{commoditySpecificationId},</if>
+            <if test="commoditySpecificationTitle != null">#{commoditySpecificationTitle},</if>
+            <if test="commoditySpecificationCommodityId != null">#{commoditySpecificationCommodityId},</if>
+            <if test="commoditySpecificationIconPath != null">#{commoditySpecificationIconPath},</if>
+            <if test="commoditySpecificationType != null">#{commoditySpecificationType},</if>
+            <if test="commoditySpecificationPrice != null">#{commoditySpecificationPrice},</if>
+            <if test="commoditySpecificationQuantity != null">#{commoditySpecificationQuantity},</if>
+        </trim>
+    </insert>
+    <!-- 商品规格表Insert结束 -->
+
+    <!-- 商品规格表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.maill.entity.CommoditySpecificationEntity">
+        update commodity_specification
+        <set>
+            <if test = "commoditySpecificationTitle != null">CS_TITLE=#{commoditySpecificationTitle},</if>
+            <if test = "commoditySpecificationCommodityId != null">CS_COMMODITY_ID=#{commoditySpecificationCommodityId},</if>
+            <if test = "commoditySpecificationIconPath != null">CS_ICON_PATH=#{commoditySpecificationIconPath},</if>
+            <if test = "commoditySpecificationType != null">CS_TYPE=#{commoditySpecificationType},</if>
+            <if test = "commoditySpecificationPrice != null">CS_PRICE=#{commoditySpecificationPrice},</if>
+            <if test = "commoditySpecificationQuantity != null">CS_QUANTITY=#{commoditySpecificationQuantity},</if>
+        </set>
+        where CS_ID = #{commoditySpecificationId}
+    </update>
+    <!-- 商品规格表Update结束 -->
+
+    <!--商品规格表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select *  from commodity_specification where CS_ID = #{commoditySpecificationId}
+    </select>
+    <!-- 商品规格表Select结束 -->
+
+</mapper>
+

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--商品优惠券持久化SQL映射xml -->
+<mapper namespace="com.refill.maill.dao.ICouponDao">
+    <sql id="column_list">
+        COUPON_ID,
+        COUPON_TITLE,
+        COUPON_PRICE,
+        COUPON_USE_TYPE,
+        COUPON_PRICE_TYPE,
+        COUPON_DATE_TYPE,
+        COUPON_VALID_DAY,
+        COUPON_START_DATE,
+        COUPON_END_DATE,
+        COUPON_CREATE_DATE,
+        COUPON_CREATE_PEOPLE_ID,
+        COUPON_UPDATE_DATE,
+        COUPON_UPDATE_PEOPLE_ID,
+        COUPON_MODULE_ID
+    </sql>
+
+    <!-- 商品优惠券字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.maill.entity.CouponEntity" >
+        <id column="COUPON_ID" property="couponId" /><!-- 商品优惠券自增长ID -->
+        <result column="COUPON_TITLE" property="couponTitle" /><!-- 商品优惠券标题 -->
+        <result column="COUPON_PRICE" property="couponPrice" /><!-- 商品优惠券折扣金额 -->
+        <result column="COUPON_USE_TYPE" property="couponUseType" /><!-- 优惠券使用类型: 0 全平台 1 仅限商户 2 仅限平台 -->
+        <result column="COUPON_PRICE_TYPE" property="couponPriceType" /><!-- 商品优惠券折扣类型0.金额折扣,如优惠100元 1.打折折扣,如打7折 -->
+        <result column="COUPON_DATE_TYPE" property="couponDateType" /><!-- 商品券有效日期类型:1.以发放时间开始,指定天数内失效2. 指定时间段 -->
+        <result column="COUPON_VALID_DAY" property="couponValidDay" /><!-- 有效天数 -->
+        <result column="COUPON_START_DATE" property="couponStartDate" /><!-- 开始日期 -->
+        <result column="COUPON_END_DATE" property="couponEndDate" /><!-- 结束日期 -->
+        <result column="COUPON_CREATE_DATE" property="couponCreateDate" /><!-- 创建时间 -->
+        <result column="COUPON_CREATE_PEOPLE_ID" property="couponCreatePeopleId" /><!-- 创建人ID -->
+        <result column="COUPON_UPDATE_DATE" property="couponUpdateDate" /><!-- 最后更新时间 -->
+        <result column="COUPON_UPDATE_PEOPLE_ID" property="couponUpdatePeopleId" /><!-- 最后更新人ID -->
+        <result column="COUPON_MODULE_ID" property="couponModuleId" /><!-- 模块ID -->
+    </resultMap>
+    <!-- 商品优惠券字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 商品优惠券Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="couponId"  parameterType="com.refill.maill.entity.CouponEntity">
+        insert into coupon
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="couponId != null">COUPON_ID,</if>
+            <if test="couponTitle != null">COUPON_TITLE,</if>
+            <if test="couponPrice != null">COUPON_PRICE,</if>
+            <if test="couponUseType != null">COUPON_USE_TYPE,</if>
+            <if test="couponPriceType != null">COUPON_PRICE_TYPE,</if>
+            <if test="couponDateType != null">COUPON_DATE_TYPE,</if>
+            <if test="couponValidDay != null">COUPON_VALID_DAY,</if>
+            <if test="couponStartDate != null">COUPON_START_DATE,</if>
+            <if test="couponEndDate != null">COUPON_END_DATE,</if>
+            <if test="couponCreateDate != null">COUPON_CREATE_DATE,</if>
+            <if test="couponCreatePeopleId != null">COUPON_CREATE_PEOPLE_ID,</if>
+            <if test="couponUpdateDate != null">COUPON_UPDATE_DATE,</if>
+            <if test="couponUpdatePeopleId != null">COUPON_UPDATE_PEOPLE_ID,</if>
+            <if test="couponModuleId != null">COUPON_MODULE_ID,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="couponId != null">#{couponId},</if>
+            <if test="couponTitle != null">#{couponTitle},</if>
+            <if test="couponPrice != null">#{couponPrice},</if>
+            <if test="couponUseType != null">#{couponUseType},</if>
+            <if test="couponPriceType != null">#{couponPriceType},</if>
+            <if test="couponDateType != null">#{couponDateType},</if>
+            <if test="couponValidDay != null">#{couponValidDay},</if>
+            <if test="couponStartDate != null">#{couponStartDate},</if>
+            <if test="couponEndDate != null">#{couponEndDate},</if>
+            <if test="couponCreateDate != null">#{couponCreateDate},</if>
+            <if test="couponCreatePeopleId != null">#{couponCreatePeopleId},</if>
+            <if test="couponUpdateDate != null">#{couponUpdateDate},</if>
+            <if test="couponUpdatePeopleId != null">#{couponUpdatePeopleId},</if>
+            <if test="couponModuleId != null">#{couponModuleId},</if>
+        </trim>
+    </insert>
+    <!-- 商品优惠券Insert结束 -->
+
+    <!-- 商品优惠券Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.maill.entity.CouponEntity">
+        update coupon
+        <set>
+            <if test = "couponTitle != null">COUPON_TITLE=#{couponTitle},</if>
+            <if test = "couponPrice != null">COUPON_PRICE=#{couponPrice},</if>
+            <if test = "couponUseType != null">COUPON_USE_TYPE=#{couponUseType},</if>
+            <if test = "couponPriceType != null">COUPON_PRICE_TYPE=#{couponPriceType},</if>
+            <if test = "couponDateType != null">COUPON_DATE_TYPE=#{couponDateType},</if>
+            <if test = "couponValidDay != null">COUPON_VALID_DAY=#{couponValidDay},</if>
+            <if test = "couponStartDate != null">COUPON_START_DATE=#{couponStartDate},</if>
+            <if test = "couponEndDate != null">COUPON_END_DATE=#{couponEndDate},</if>
+            <if test = "couponCreateDate != null">COUPON_CREATE_DATE=#{couponCreateDate},</if>
+            <if test = "couponCreatePeopleId != null">COUPON_CREATE_PEOPLE_ID=#{couponCreatePeopleId},</if>
+            <if test = "couponUpdateDate != null">COUPON_UPDATE_DATE=#{couponUpdateDate},</if>
+            <if test = "couponUpdatePeopleId != null">COUPON_UPDATE_PEOPLE_ID=#{couponUpdatePeopleId},</if>
+            <if test = "couponModuleId != null">COUPON_MODULE_ID=#{couponModuleId},</if>
+        </set>
+        where COUPON_ID = #{couponId}
+    </update>
+    <!-- 商品优惠券Update结束 -->
+
+    <!--商品优惠券Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select *  from coupon where COUPON_ID = #{couponId}
+    </select>
+    <!-- 商品优惠券Select结束 -->
+
+</mapper>
+

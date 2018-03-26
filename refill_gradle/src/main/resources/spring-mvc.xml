@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+               http://www.springframework.org/schema/mvc
+               http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context-4.2.xsd
+               ">
+
+    <!-- 扫描视图请求的包(action层) -->
+    <context:component-scan base-package="com.refill.**.action"/>
+    <!-- 静态资源(js、image等)的访问  将无法mapping到Controller的path交给default servlet handler处理 -->
+    <mvc:default-servlet-handler/>
+    <!--
+        启用mvc注解
+        conversion-service: 注册自定义格式器和转换器,启用如@NumberFormat和@DateTimeFormat的格式注解
+        enable-matrix-variables: 规范请求参数
+    -->
+    <mvc:annotation-driven conversion-service="conversionService" enable-matrix-variables="true"/>
+
+    <!-- 使用fastjson返回json数据  需要导入 fastjson.jar包 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html; charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <property name="fastJsonConfig">
+                    <bean class="com.alibaba.fastjson.support.config.FastJsonConfig">
+                        <property name="features">
+                            <list>
+                                <value>AllowArbitraryCommas</value>
+                                <value>AllowUnQuotedFieldNames</value>
+                                <value>DisableCircularReferenceDetect</value>
+                            </list>
+                        </property>
+                        <property name="dateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+       
+    <!-- freemarker视图属性配置 -->
+    <bean id="freemarkerConfig"  class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <!--指定ftl文件路径-->
+        <property name="templateLoaderPath" value="/WEB-INF"/>
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="xml_escape" value-ref="fmXmlEscape"/>
+            </map>
+        </property>
+        <!--指定编码-->
+        <property name="defaultEncoding" value="utf-8"/>
+        <!--其他设置-->
+        <property name="freemarkerSettings">
+            <props>
+                <!--模板更新间隔,项目工作时建议设置较大数字 3600-->
+                <prop key="template_update_delay">3600</prop>
+                <!--语言-->
+                <prop key="locale">zh_CN</prop>
+                <!--时间格式-->
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <!--日期格式-->
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <!--数字格式-->
+                <prop key="number_format">#.##</prop>
+                <!--freemarker自定义标签引用-->
+                <prop key="auto_import">/include/macro.ftl as rs</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape"/>
+
+
+    <!-- freemarker视图解析器 -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <!--设置编码-->
+        <property name="contentType" value="text/html; charset=utf-8"/>
+        <!--启用缓存-->
+        <property name="cache" value="true"/>
+        <!--设置文件前缀,没有则不填-->
+        <property name="prefix" value=""/>
+        <!--解析后缀为ftl的文件-->
+        <property name="suffix" value=".ftl"/>
+        <!--视图级别,当配置多个视图时使用-->
+        <property name="order" value="0"/>
+
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="allowRequestOverride" value="true"/>
+        <property name="exposeRequestAttributes" value="true"/>
+        <property name="exposeSessionAttributes" value="true"/>
+        <property name="exposeSpringMacroHelpers" value="true"/>
+    </bean>
+
+
+    <!--后台freemarker权限标签-->
+    <!--<bean id="shiroMayn" class="com.refill.shiro.tag.PermissionDirective"/>-->
+
+    <!-- 控制器异常处理 -->
+    <bean id="exceptionHandlerExceptionResolver" class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver"/>
+
+</beans>

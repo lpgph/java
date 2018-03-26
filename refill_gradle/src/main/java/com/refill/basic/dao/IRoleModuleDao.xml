@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--角色权限表持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.IRoleModuleDao">
+    <sql id="column_list">
+        RM_ROLE_ID,
+        RM_MODULE_ID
+    </sql>
+
+    <!-- 角色权限表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.RoleModuleEntity" >
+        <result column="RM_ROLE_ID" property="roleModuleRoleId" /><!-- 角色ID -->
+        <result column="RM_MODULE_ID" property="roleModuleModuleId" /><!-- 模块ID -->
+    </resultMap>
+    <!-- 角色权限表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 批量添加 -->
+    <insert id="saveBatchById" parameterType="list">
+        insert into role_model (RM_ROLE_ID,RM_MODEL_ID) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <!-- 批量更新 -->
+    <update id="updateBatchById" parameterType="list">
+        replace into role_model (RM_ROLEID,RM_MODELID) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{roleId},#{item})
+        </foreach>
+    </update>
+
+    <!--根据rooleId删除权限-->
+    <delete id="deleteEntity" parameterType="int">
+        DELETE FROM role_model WHERE roole_id = #{rooleId}
+    </delete>
+
+
+    <sql id="orderby">
+        <foreach collection="orderList" item="item" index="index" separator=",">
+            <if test="item.orderBy == 'roleModuleRoleId' ">
+                RM_ROLE_ID ${item.order},
+            </if>
+        </foreach>
+    </sql>
+
+    <!--通过条件查询总条数 -->
+    <select id="countByRoleId" resultType="int">
+        select count(*)
+        from role_module
+        <where>
+            RM_ROLE_ID=#{roleId}
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByRoleId" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from role_module
+        <where>
+            RM_ROLE_ID=#{roleId}
+        </where>
+        <if test="orderMap != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+    </select>
+
+
+</mapper>
+

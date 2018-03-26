@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+               http://www.springframework.org/schema/aop
+               http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+               " default-lazy-init="true">
+    <description>Shiro Configuration</description>
+
+    <!-- 凭证匹配器 -->
+    <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="MD5"/>
+    </bean>
+
+    <!-- 缓存管理器 使用redis管理，如果没有redis则存储到物理内存中-->
+    <bean id="cacheManager" class="com.refill.shiro.redis.RedisCacheManager">
+        <property name="redisManager" ref="redisManager" />
+    </bean>
+
+    <!-- Realm实现 -->
+    <bean id="administratorRealm" class="com.refill.shiro.realm.AdministratorRealm">
+        <!--凭证匹配器-->
+        <property name="credentialsMatcher" ref="credentialsMatcher"/>
+        <!--启用凭证匹配器(密码加密和校验)-->
+        <property name="cachingEnabled" value="true"/>
+
+        <!--启用身份验证缓存，即缓存AuthenticationInfo信息，默认false；-->
+        <!--<property name="authenticationCachingEnabled" value="true"/>-->
+        <!--缓存AuthenticationInfo信息的缓存名称-->
+        <!--<property name="authenticationCacheName" value="authenticationCache"/>-->
+        <!--启用授权缓存，即缓存AuthorizationInfo信息，默认false；-->
+        <property name="authorizationCachingEnabled" value="true"/>
+        <!--缓存AuthorizationInfo信息的缓存名称-->
+        <property name="authorizationCacheName" value="authorizationCache"/>
+        <!--缓存管理器-->
+        <property name="cacheManager" ref="cacheManager"/>
+    </bean>
+
+    <!-- shiro redisManager -->
+    <bean id="redisManager" class="com.refill.shiro.redis.RedisManager">
+        <!-- redis服务器 -->
+        <property name="host" value="127.0.0.1"/>
+        <property name="port" value="6379"/>
+        <!--session过期时间-->
+        <property name="expire" value="1800"/>
+        <!--设置链接超时时间-->
+        <!--<property name="timeout" value="120000"/>-->
+        <!--<property name="password" value="123456"/>-->
+    </bean>
+
+    <!--会话存储/持久化  使用redis管理，如果没有redis则存储到物理内存中 -->
+    <bean id="sessionDAO" class="com.refill.shiro.redis.RedisSessionDAO">
+        <!--设置Session缓存名字，默认就是shiro-activeSessionCache；-->
+        <property name="redisManager" ref="redisManager" />
+        <!--于生成会话ID，默认就是JavaUuidSessionIdGenerator，使用java.util.UUID生成-->
+        <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
+    </bean>
+    <!--会话验证调度器  如果会话过期将停止会话-->
+    <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler">
+        <!--设置调度时间间隔，单位毫秒，默认就是1小时；-->
+        <property name="interval" value="1800000"/>
+        <!--设置会话验证调度器进行会话验证时的会话管理器-->
+        <property name="sessionManager" ref="sessionManager"/>
+    </bean>
+    <!--web 会话管理器 直接使用Servlet容器的会话-->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <!--设置全局会话超时时间，默认30分钟，即如果30分钟内没有访问会话将过期,单位毫秒-->
+        <property name="globalSessionTimeout" value="1800000"/>
+        <!--间隔时间-->
+        <property name="sessionValidationInterval" value="600000"/>
+        <!--删除无效的会话-->
+        <property name="deleteInvalidSessions" value="true"/>
+        <!--是否开启会话验证器，默认是开启的；-->
+        <property name="sessionValidationSchedulerEnabled" value="true"/>
+        <!--设置会话验证调度器，默认就是使用-->
+        <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/>
+        <property name="sessionDAO" ref="sessionDAO"/>
+        <property name="sessionIdCookieEnabled" value="true"/>
+        <property name="sessionIdCookie" ref="sessionIdCookie"/>
+    </bean>
+
+    <!-- 会话ID生成器 -->
+    <bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/>
+    <!-- 会话Cookie模板  // //生产Session ID Cookie的模板；-->
+    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <!--设置Cookie名字，默认为JSESSIONID；-->
+        <constructor-arg name="name" value="mayn.session.id"/>
+        <!--httpOnly 如果设置为true，则客户端不会暴露给客户端脚本代码，使用HttpOnly cookie有助于减少某些类型的跨站点脚本攻击；
+此特性需要实现了Servlet 2.5 MR6及以上版本的规范的Servlet容器支持；-->
+        <property name="httpOnly" value="true"/>
+        <!--设置Cookie的过期时间，秒为单位，默认-1表示关闭浏览器时过期Cookie；-->
+        <property name="maxAge" value="-1"/>
+    </bean>
+    <!--会话DAO-->
+
+    <!-- 安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="administratorRealm"/>
+        <property name="sessionManager" ref="sessionManager"/>
+        <property name="cacheManager" ref="cacheManager"/>
+    </bean>
+
+    <!-- 基于后台Form表单的身份验证过滤器  可以再添加自己的Filter bean定义 -->
+    <bean id="formAuthenticationFilter" class="com.refill.shiro.filter.RefillFormAuthenticationFilter">
+        <property name="usernameParam" value="username"/>
+        <property name="passwordParam" value="password"/>
+        <property name="isForcibly" value="isForcibly"/>
+
+        <!--强制登陆-->
+        <!--<property name="isforcibly" value="forcibly"/>-->
+        <property name="loginUrl" value="/login.do"/>
+        <property name="successUrl" value="/manager/index.do"/>
+    </bean>
+
+    <!--&lt;!&ndash;拦截access_token&ndash;&gt;-->
+    <!--<bean id="thirdAuthenticationFilter" class="com.refill.shiro.filter.ThirdAuthenticationFilter">-->
+        <!--<property name="authcCodeParam" value="access_token"/>-->
+    <!--</bean>-->
+
+    <!-- Shiro的Web过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- shiro的核心安全接口 -->
+        <property name="securityManager" ref="securityManager"/>
+
+        <!-- 要求登录时的链接 -->
+        <property name="loginUrl" value="/login.do"/>
+        <!-- 登陆成功后要跳转的连接 -->
+        <property name="successUrl" value="/manager/index.do"/>
+        <!-- 未认证时要跳转的连接 -->
+        <property name="unauthorizedUrl" value="/unauthorized.do"/>
+        <!--定义自己的过滤器-->
+        <property name="filters">
+            <map>
+                <!--&lt;!&ndash;第三方接口调用过滤&ndash;&gt;-->
+                <!--<entry key="thirdAuthc" value-ref="thirdAuthenticationFilter"/>-->
+                <!--表单提交过滤-->
+                <entry key="authc" value-ref="formAuthenticationFilter"/>
+            </map>
+        </property>
+        <!--声明url和filter的关系 /cas = cas-->
+        <property name="filterChainDefinitions">
+            <!--
+            anon 无需认证
+            logout 退出
+            authc 自定义权限
+            user 登陆后的用户
+            -->
+            <!--无需认证便可以访问的的文件放在前面-->
+            <value>
+                /**/css/**=anon
+                /**/Plugins/**=anon
+                /**/js/**=anon
+                /**/icons/**=anon
+                /**/images/**=anon
+                /**/downloads/**=anon
+                /**/proxy=anon
+                /**/download=anon
+                /**/CLodopfuncs.js=anon
+                /**/qrcode=anon
+                /**/upload=anon
+                /**/exprotTable=anon
+                /**/api/open/**=anon
+                /**/api/service/**=anon
+                /**/web/system/**=anon
+                /**/ReportServer=anon
+                /**/unauthorized.do=anon
+                /**/manager/session/**=anon
+                /**/manager/**=thirdAuthc
+                /**/loginOut.do=logout
+                /**/login.do=authc
+                /**=user
+            </value>
+        </property>
+    </bean>
+
+    <!-- 相当于调用SecurityUtils.setSecurityManager(securityManager) -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager"/>
+        <property name="arguments" ref="securityManager"/>
+    </bean>
+    <!-- Shiro生命周期处理器-->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+
+    <!--启用shiro权限注解 -->
+    <aop:config proxy-target-class="true"/>
+    <!--上面启用的另一种方式-->
+
+    <!-- 授权属性源 -->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <!-- 设置安全管理器 -->
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+</beans>
+

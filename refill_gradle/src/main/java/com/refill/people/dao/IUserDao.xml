@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--普通用户表持久化SQL映射xml -->
+<mapper namespace="com.refill.people.dao.IUserDao">
+    <sql id="column_list">
+        USER_ID,
+        USER_PHONE,
+        USER_MAIL,
+        USER_ACCOUNT,
+        USER_PASSWORD,
+        USER_NAME,
+        USER_STATUS,
+        USER_CATEGORY_ID,
+        USER_CREATE_DATE,
+        USER_UPDATE_DATE
+    </sql>
+
+    <!-- 普通用户表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.people.entity.UserEntity">
+        <id column="USER_ID" property="userId"/><!-- 用户ID -->
+        <result column="USER_PHONE" property="userPhone"/><!-- 用户手机 -->
+        <result column="USER_MAIL" property="userMail"/><!-- 用户邮箱 -->
+        <result column="USER_ACCOUNT" property="userAccount"/><!-- 用户账号 -->
+        <result column="USER_PASSWORD" property="userPassword"/><!-- 用户密码 -->
+        <result column="USER_NAME" property="userName"/><!-- 用户名称 -->
+        <result column="USER_STATUS" property="userStatus"/><!-- 用户状态 -->
+        <result column="USER_CATEGORY_ID" property="userCategoryId"/><!-- 用户分类 -->
+        <result column="USER_CREATE_DATE" property="userCreateDate"/><!-- 商户创建时间 -->
+        <result column="USER_UPDATE_DATE" property="userUpdateDate"/><!-- 商户更新时间 -->
+    </resultMap>
+    <!-- 普通用户表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 普通用户表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="userId"
+            parameterType="com.refill.people.entity.UserEntity">
+        insert into user
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">USER_ID,</if>
+            <if test="userPhone != null">USER_PHONE,</if>
+            <if test="userMail != null">USER_MAIL,</if>
+            <if test="userAccount != null">USER_ACCOUNT,</if>
+            <if test="userPassword != null">USER_PASSWORD,</if>
+            <if test="userName != null">USER_NAME,</if>
+            <if test="userStatus != null">USER_STATUS,</if>
+            <if test="userCategoryId != null">USER_CATEGORY_ID,</if>
+            <if test="userCreateDate != null">USER_CREATE_DATE,</if>
+            <if test="userUpdateDate != null">USER_UPDATE_DATE,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="userPhone != null">#{userPhone},</if>
+            <if test="userMail != null">#{userMail},</if>
+            <if test="userAccount != null">#{userAccount},</if>
+            <if test="userPassword != null">#{userPassword},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="userStatus != null">#{userStatus},</if>
+            <if test="userCategoryId != null">#{userCategoryId},</if>
+            <if test="userCreateDate != null">#{userCreateDate},</if>
+            <if test="userUpdateDate != null">#{userUpdateDate},</if>
+        </trim>
+    </insert>
+    <!-- 普通用户表Insert结束 -->
+
+    <!-- 普通用户表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.people.entity.UserEntity">
+        update user
+        <set>
+            <if test="userPhone != null">USER_PHONE=#{userPhone},</if>
+            <if test="userMail != null">USER_MAIL=#{userMail},</if>
+            <if test="userAccount != null">USER_ACCOUNT=#{userAccount},</if>
+            <if test="userPassword != null">USER_PASSWORD=#{userPassword},</if>
+            <if test="userName != null">USER_NAME=#{userName},</if>
+            <if test="userStatus != null">USER_STATUS=#{userStatus},</if>
+            <if test="userCategoryId != null">USER_CATEGORY_ID=#{userCategoryId},</if>
+            <if test="userCreateDate != null">USER_CREATE_DATE=#{userCreateDate},</if>
+            <if test="userUpdateDate != null">USER_UPDATE_DATE=#{userUpdateDate},</if>
+        </set>
+        where USER_ID = #{userId}
+    </update>
+    <!-- 普通用户表Update结束 -->
+
+    <!--普通用户表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        SELECT *
+        FROM user
+        WHERE USER_ID = #{userId}
+    </select>
+    <!-- 普通用户表Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.userAccount != null">
+                and USER_ACCOUNT like CONCAT('%',#{whereMap.userAccount},'%')
+            </if>
+            <if test="whereMap.userMail != null">
+                and USER_MAIL like CONCAT('%',#{whereMap.userMail},'%')
+            </if>
+            <if test="whereMap.userPhone != null">
+                and USER_PHONE like CONCAT('%',#{whereMap.userPhone},'%')
+            </if>
+            <if test="whereMap.userName != null">
+                and USER_NAME like CONCAT('%',#{whereMap.userName},'%')
+            </if>
+            <if test="whereMap.userStatus !=null">
+                and USER_STATUS=#{whereMap.userStatus}
+            </if>
+            <if test="whereMap.userCategoryId !=null">
+                and USER_CATEGORY_ID=#{whereMap.userCategoryId}
+            </if>
+            <if test="whereMap.userCreateDate !=null">
+                and USER_CREATE_DATE=#{whereMap.userCreateDate}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <trim suffix="" suffixOverrides=",">
+            <if test="orderMap.userCreateDate != null">
+                USER_CREATE_DATE ${orderMap.userCreateDate},
+            </if>
+            <if test="orderMap.userPhone != null">
+                USER_PHONE ${orderMap.userPhone},
+            </if>
+            <if test="orderMap.userAccount != null">
+                USER_CATEGORY_ID ${orderMap.userAccount},
+            </if>
+            <if test="orderMap.userName != null">
+                USER_NAME ${orderMap.userName},
+            </if>
+            <if test="orderMap.userStatus != null">
+                USER_STATUS ${orderMap.userStatus},
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+    <!-- 通过条件查询管理员总条数 -->
+    <select id="countByMap">
+        select count(*)
+        from user
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!-- 通过条件查询管理员集合 -->
+    <select id="queryListByMapPage">
+        select
+        <include refid="column_list"/>
+        from user
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderMap != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+</mapper>
+

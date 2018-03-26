@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--评论持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.ICommentDao">
+    <sql id="column_list">
+        COMMENT_ID,
+        COMMENT_CONTENT,
+        COMMENT_COMMENT_ID,
+        COMMENT_PATH,
+        COMMENT_TYPE,
+        COMMENT_MAIN_ID,
+        COMMENT_SCORE,
+        COMMENT_CREATE_USER_ID,
+        COMMENT_CREATE_DATE
+    </sql>
+
+    <!-- 评论字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.CommentEntity">
+        <id column="COMMENT_ID" property="baseTreeId"/><!-- 评论自增长ID -->
+        <result column="COMMENT_CONTENT" property="commentContent"/><!-- 评论内容 -->
+        <result column="COMMENT_COMMENT_ID" property="baseTreeParentId"/><!-- 父级评论ID -->
+        <result column="COMMENT_PATH" property="baseTreeParentPath"/><!-- 父级评论路径 -->
+        <result column="COMMENT_TYPE" property="commentType"/><!-- 评论的类型：1 匿名，2 公开，默认为公开 -->
+        <result column="COMMENT_MODULE_ID" property="commentModuleId"/><!--评论的模块ID-->
+        <result column="COMMENT_MAIN_ID" property="commentMainId"/><!-- 评论的主体ID,如文章,商品 -->
+        <result column="COMMENT_SCORE" property="commentScore"/><!-- 评分 -->
+        <result column="COMMENT_CREATE_USER_ID" property="commentCreateUserId"/><!-- 评论用户ID,ID为0则为后台管理员回复 -->
+        <result column="COMMENT_CREATE_DATE" property="commentCreateDate"/><!-- 创建时间 -->
+    </resultMap>
+    <!-- 评论字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 评论Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="baseTreeId"
+            parameterType="com.refill.basic.entity.CommentEntity">
+        insert into comment
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commentContent != null">COMMENT_CONTENT,</if>
+            <if test="baseTreeParentId != null">COMMENT_COMMENT_ID,</if>
+            <if test="baseTreeParentPath != null">COMMENT_PATH,</if>
+            <if test="commentType != null">COMMENT_TYPE,</if>
+            <if test="commentMainId != null">COMMENT_MAIN_ID,</if>
+            <if test="commentScore != null">COMMENT_SCORE,</if>
+            <if test="commentCreateUserId != null">COMMENT_CREATE_USER_ID,</if>
+            <if test="commentCreateDate != null">COMMENT_CREATE_DATE,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commentContent != null">#{commentContent},</if>
+            <if test="baseTreeParentId != null">#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">#{baseTreeParentPath},</if>
+            <if test="commentType != null">#{commentType},</if>
+            <if test="commentMainId != null">#{commentMainId},</if>
+            <if test="commentScore != null">#{commentScore},</if>
+            <if test="commentCreateUserId != null">#{commentCreateUserId},</if>
+            <if test="commentCreateDate != null">#{commentCreateDate},</if>
+        </trim>
+    </insert>
+    <!-- 评论Insert结束 -->
+
+    <!-- 评论Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.basic.entity.CommentEntity">
+        update comment
+        <set>
+            <if test="commentContent != null">COMMENT_CONTENT=#{commentContent},</if>
+            <if test="baseTreeParentId != null">COMMENT_COMMENT_ID=#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">COMMENT_PATH=#{baseTreeParentPath},</if>
+            <if test="commentType != null">COMMENT_TYPE=#{commentType},</if>
+            <if test="commentMainId != null">COMMENT_MAIN_ID=#{commentMainId},</if>
+            <if test="commentScore != null">COMMENT_SCORE=#{commentScore},</if>
+            <if test="commentCreateUserId != null">COMMENT_CREATE_USER_ID=#{commentCreateUserId},</if>
+            <if test="commentCreateDate != null">COMMENT_CREATE_DATE=#{commentCreateDate},</if>
+        </set>
+        where COMMENT_ID = #{baseTreeId}
+    </update>
+    <!-- 评论Update结束 -->
+
+    <!--评论Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select
+        <include refid="column_list"/>
+        from comment where COMMENT_ID = #{baseTreeId}
+    </select>
+    <!-- 评论Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.commentContent != null">
+                and COMMENT_CONTENT like CONCAT('%',#{whereMap.commentContent},'%')
+            </if>
+            <if test="whereMap.commentCreateUserId &gt;0">
+                and COMMENT_CREATE_USER_ID=#{whereMap.commentCreateUserId}
+            </if>
+            <if test="whereMap.commentMainId &gt;0">
+                and COMMENT_MAIN_ID=#{whereMap.commentMainId}
+            </if>
+            <if test="whereMap.commentScore &gt;0">
+                and COMMENT_SCORE=#{whereMap.commentScore}
+            </if>
+            <if test="whereMap.commentCreateDate !=null">
+                and COMMENT_CREATE_DATE=#{whereMap.commentCreateDate}
+            </if>
+            <if test="whereMap.commentModuleId &gt;0">
+                and COMMENT_MODULE_ID=#{whereMap.commentModuleId}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <trim suffix="" suffixOverrides=",">
+            <if test="orderMap.commentScore != null">
+                COMMENT_SCORE ${orderMap.commentScore},
+            </if>
+            <if test="orderMap.commentCreateDate != null">
+                COMMENT_CREATE_DATE ${orderMap.commentCreateDate},
+            </if>
+            <if test="orderMap.commentModuleId != null">
+                COMMENT_MODULE_ID ${orderMap.commentModuleId},
+            </if>
+            <if test="orderMap.commentScore != null">
+                COMMENT_MAIN_ID ${orderMap.commentScore},
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+    <!--通过条件查询总条数 -->
+    <select id="countByModuleIdAndMap" resultType="int">
+        select count(*)
+        from comment
+        <where>
+            COMMENT_MODULE_ID=#{moduleId}
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByModuleIdAndMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from comment
+        <where>
+            COMMENT_MODULE_ID=#{moduleId}
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderMap != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+</mapper>
+

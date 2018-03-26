@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--平台优惠券记录持久化SQL映射xml -->
+<mapper namespace="com.refill.maill.dao.ICouponRecordDao">
+    <sql id="column_list">
+        CR_ID,
+        CR_COUPON_ID,
+        CR_USER_ID,
+        CR_CREATE_DATE,
+        CR_START_DATE,
+        CR_END_DATE,
+        CR_STATUS
+    </sql>
+
+    <!-- 平台优惠券记录字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.maill.entity.CouponRecordEntity" >
+        <id column="CR_ID" property="couponRecordId" /><!-- 商品优惠券记录自增长ID -->
+        <result column="CR_COUPON_ID" property="couponRecordCouponId" /><!-- 商品优惠券ID -->
+        <result column="CR_USER_ID" property="couponRecordUserId" /><!-- 用户ID -->
+        <result column="CR_CREATE_DATE" property="couponRecordCreateDate" /><!-- 优惠券创建时间 -->
+        <result column="CR_START_DATE" property="couponRecordStartDate" /><!-- 优惠券有效开始时间 -->
+        <result column="CR_END_DATE" property="couponRecordEndDate" /><!-- 优惠券有效结束时间 -->
+        <result column="CR_STATUS" property="couponRecordStatus" /><!-- 优惠券状态:0.未使用,1已使用,2已过期 -->
+    </resultMap>
+    <!-- 平台优惠券记录字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 平台优惠券记录Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="couponRecordId"  parameterType="com.refill.maill.entity.CouponRecordEntity">
+        insert into coupon_record
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="couponRecordId != null">CR_ID,</if>
+            <if test="couponRecordCouponId != null">CR_COUPON_ID,</if>
+            <if test="couponRecordUserId != null">CR_USER_ID,</if>
+            <if test="couponRecordCouponRecordeateDate != null">CR_CREATE_DATE,</if>
+            <if test="couponRecordStartDate != null">CR_START_DATE,</if>
+            <if test="couponRecordEndDate != null">CR_END_DATE,</if>
+            <if test="couponRecordStatus != null">CR_STATUS,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="couponRecordId != null">#{couponRecordId},</if>
+            <if test="couponRecordCouponId != null">#{couponRecordCouponId},</if>
+            <if test="couponRecordUserId != null">#{couponRecordUserId},</if>
+            <if test="couponRecordCouponRecordeateDate != null">#{couponRecordCouponRecordeateDate},</if>
+            <if test="couponRecordStartDate != null">#{couponRecordStartDate},</if>
+            <if test="couponRecordEndDate != null">#{couponRecordEndDate},</if>
+            <if test="couponRecordStatus != null">#{couponRecordStatus},</if>
+        </trim>
+    </insert>
+    <!-- 平台优惠券记录Insert结束 -->
+
+    <!-- 平台优惠券记录Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.maill.entity.CouponRecordEntity">
+        update coupon_record
+        <set>
+            <if test = "couponRecordCouponId != null">CR_COUPON_ID=#{couponRecordCouponId},</if>
+            <if test = "couponRecordUserId != null">CR_USER_ID=#{couponRecordUserId},</if>
+            <if test = "couponRecordCouponRecordeateDate != null">CR_CREATE_DATE=#{couponRecordCouponRecordeateDate},</if>
+            <if test = "couponRecordStartDate != null">CR_START_DATE=#{couponRecordStartDate},</if>
+            <if test = "couponRecordEndDate != null">CR_END_DATE=#{couponRecordEndDate},</if>
+            <if test = "couponRecordStatus != null">CR_STATUS=#{couponRecordStatus},</if>
+        </set>
+        where CR_ID = #{couponRecordId}
+    </update>
+    <!-- 平台优惠券记录Update结束 -->
+
+    <!--平台优惠券记录Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select *  from coupon_record where CR_ID = #{couponRecordId}
+    </select>
+    <!-- 平台优惠券记录Select结束 -->
+
+</mapper>
+

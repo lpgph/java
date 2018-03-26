@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--模块表持久化SQL映射xml -->
+<mapper namespace="com.refill.basic.dao.IModuleDao">
+    <sql id="column_list">
+        MODULE_ID,
+        MODULE_TITLE,
+        MODULE_MODULE_ID,
+        MODULE_PATH,
+        MODULE_CODE,
+        MODULE_ICON_PATH,
+        MODULE_SORT,
+        MODULE_URL
+    </sql>
+
+    <!-- 模块表字段和实体绑定,返回实体信息时使用 开始 -->
+    <resultMap id="resultMap" type="com.refill.basic.entity.ModuleEntity" >
+        <id column="MODULE_ID" property="baseTreeId" /><!-- 模块ID -->
+        <result column="MODULE_TITLE" property="moduleTitle" /><!-- 模块标题 -->
+        <result column="MODULE_MODULE_ID" property="baseTreeParentId" /><!-- 父级模块ID -->
+        <result column="MODULE_PATH" property="baseTreeParentPath" /><!-- 模块父级路径，如/0/1/2/3/4/ -->
+        <result column="MODULE_CODE" property="moduleCode" /><!-- 模块编码 -->
+        <result column="MODULE_ICON_PATH" property="moduleIconPath" /><!-- 模块缩略图 -->
+        <result column="MODULE_SORT" property="moduleSort" /><!-- 模块排序 -->
+        <result column="MODULE_URL" property="moduleUrl" /><!-- 模块请求路径 -->
+    </resultMap>
+    <!-- 模块表字段和实体绑定,返回实体信息时使用  结束 -->
+
+    <!-- 模块表Insert开始 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="baseTreeId"  parameterType="com.refill.basic.entity.ModuleEntity">
+        insert into module
+        <!-- 添加表字段 -->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="moduleTitle != null">MODULE_TITLE,</if>
+            <if test="baseTreeParentId != null">MODULE_MODULE_ID,</if>
+            <if test="baseTreeParentPath != null">MODULE_PATH,</if>
+            <if test="moduleCode != null">MODULE_CODE,</if>
+            <if test="moduleIconPath != null">MODULE_ICON_PATH,</if>
+            <if test="moduleSort != null">MODULE_SORT,</if>
+            <if test="moduleUrl != null">MODULE_URL,</if>
+        </trim>
+        <!-- 注入控制层字段 -->
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="moduleTitle != null">#{moduleTitle},</if>
+            <if test="baseTreeParentId != null">#{baseTreeParentId},</if>
+            <if test="baseTreeParentPath != null">#{baseTreeParentPath},</if>
+            <if test="moduleCode != null">#{moduleCode},</if>
+            <if test="moduleIconPath != null">#{moduleIconPath},</if>
+            <if test="moduleSort != null">#{moduleSort},</if>
+            <if test="moduleUrl != null">#{moduleUrl},</if>
+        </trim>
+    </insert>
+    <!-- 模块表Insert结束 -->
+
+    <!-- 模块表Update开始 -->
+    <update id="updateEntity" parameterType="com.refill.basic.entity.ModuleEntity">
+        update module
+        <set>
+            <if test = "moduleTitle != null">MODULE_TITLE=#{moduleTitle},</if>
+            <if test = "baseTreeParentId != null">MODULE_MODULE_ID=#{baseTreeParentId},</if>
+            <if test = "baseTreeParentPath != null">MODULE_PATH=#{baseTreeParentPath},</if>
+            <if test = "moduleCode != null">MODULE_CODE=#{moduleCode},</if>
+            <if test = "moduleIconPath != null">MODULE_ICON_PATH=#{moduleIconPath},</if>
+            <if test = "moduleSort != null">MODULE_SORT=#{moduleSort},</if>
+            <if test = "moduleUrl != null">MODULE_URL=#{moduleUrl},</if>
+        </set>
+        where MODULE_ID = #{baseTreeId}
+    </update>
+    <!-- 模块表Update结束 -->
+
+    <!--模块表Select开始 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="int">
+        select
+        <include refid="column_list"/>
+        from module where MODULE_ID = #{baseTreeId}
+    </select>
+    <!-- 模块表Select结束 -->
+
+    <sql id="whereMap">
+        <if test="whereMap != null">
+            <if test="whereMap.baseTreeParentPath != null">
+                and MODULE_PATH like CONCAT('%',#{whereMap.baseTreeParentPath},'%')
+            </if>
+            <if test="whereMap.baseTreeParentId &gt; 0 ">
+                and MODULE_MODULE_ID = #{baseTreeParentId}
+            </if>
+        </if>
+    </sql>
+    <sql id="orderby">
+        <foreach collection="orderList" item="item" index="index" separator=",">
+            <if test="item.orderBy == 'moduleSort' ">
+                MODULE_SORT ${item.order},
+            </if>
+            <if test="item.orderBy == 'moduleCode' ">
+                MODULE_CODE ${item.order},
+            </if>
+            <if test="item.orderBy == 'baseTreeParentId'">
+                MODULE_MODULE_ID ${item.order},
+            </if>
+            <if test="item.orderBy == 'baseTreeId'">
+                MODULE_ID ${item.order},
+            </if>
+        </foreach>
+    </sql>
+    <sql id="page">
+        <if test="page!=null">
+            limit ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </sql>
+
+
+    <select id="countByMap" resultType="int">
+        select count(*)
+        from module
+        <where>
+            <include refid="whereMap"/>
+        </where>
+    </select>
+
+    <!--通过条件分页查询 -->
+    <select id="queryListByMapPage" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from module
+        <where>
+            <include refid="whereMap"/>
+        </where>
+        <if test="orderList != null">
+            order by
+            <include refid="orderby"/>
+        </if>
+        <include refid="page"/>
+    </select>
+
+    <select id="getModuleEntity" resultMap="resultMap">
+        select
+        <include refid="column_list"/>
+        from module where MODULE_CODE = #{moduleCode}
+    </select>
+
+    <delete id="deleteEntity">
+        DELETE FROM module WHERE MODULE_ID = #{baseTreeId}
+    </delete>
+</mapper>
+
