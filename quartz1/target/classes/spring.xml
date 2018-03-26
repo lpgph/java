@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context-4.2.xsd
+               http://www.springframework.org/schema/aop
+               http://www.springframework.org/schema/aop/spring-aop-4.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--扫描注入的包，这里扫描了biz.impl和dao，扫描dao,是因为在biz.impl中需要引用，扫描biz是因为在其他地方需要引用-->
+    <context:component-scan base-package="com.refill.**.biz.impl"/>
+    <!--启用AOP-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+
+    <!--获取jdbc配置-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--添加数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="0"/>
+        <!-- 连接池最大使用连接数量 -->
+        <property name="maxActive" value="20"/>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="1"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="60000"/>
+
+        <!-- <property name="poolPreparedStatements" value="true" /> <property
+            name="maxPoolPreparedStatementPerConnectionSize" value="33" /> -->
+
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="25200000"/>
+
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="true"/>
+        <!-- 1800秒，也就是30分钟 超过30分钟关闭申请的连接-->
+        <property name="removeAbandonedTimeout" value="1800"/>
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="true"/>
+        <!--默认提交事务-->
+        <property name="defaultAutoCommit" value="true"/>
+
+        <!-- 监控数据库 -->
+        <!-- <property name="filters" value="stat,slf4j" /> -->
+        <property name="filters" value="stat,slf4j"/>
+
+    </bean>
+
+
+    <!-- 配置数据库监视日志-->
+    <bean id="slf4jLogFilter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+        <property name="connectionLogEnabled" value="false"/>
+        <property name="statementLogEnabled" value="false"/>
+        <property name="resultSetLogEnabled" value="true"/>
+        <property name="statementExecutableSqlLogEnable" value="true"/>
+    </bean>
+
+    <!--开启spring事务处理-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--开启注解事务-->
+    <tx:annotation-driven transaction-manager="txManager" />
+
+    <!-- 定时任务配置 start -->
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false" autowire="no">
+        <property name="configLocation" value="classpath:spring-quartz.properties" />
+        <property name="jobFactory">
+            <!-- 在job定时任务中调用service注解无效解决方案 -->
+            <bean class="com.refill.job.bean.CustomJobFactory"/>
+        </property>
+        <!-- scheduler的名称 -->
+        <property name="schedulerName" value="scheduler"/>
+        <!--覆盖了配置文件中的数据库地址-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--使用spring的事务管理-->
+        <property name="transactionManager" ref="txManager"/>
+        <!--可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了-->
+        <property name="overwriteExistingJobs" value="true" />
+        <!-- 必须的，QuartzScheduler 延时启动，应用启动完后 QuartzScheduler 再启动  -->
+        <property name="startupDelay" value="1" />
+        <!-- 设置自动启动  -->
+        <property name="autoStartup" value="true" />
+        <!-- 把spring上下 文以key/value的方式存放在了quartz的上下文中了 -->
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
+    </bean>
+    <!-- 定时任务配置 end -->
+    <!-- 配置scheduler -->
+    <bean class="com.refill.job.bean.JobBeanUtil" >
+        <property name="scheduler" ref="scheduler"/>
+    </bean>
+</beans>
+
